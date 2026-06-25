@@ -28,6 +28,7 @@ The `invoices` table includes:
 | `create_invoice` | Insert a new invoice |
 | `update_invoice` | Update an existing invoice by ID |
 | `delete_invoice` | Delete an invoice by ID |
+| `list_invoices` | Search/list invoices with pagination |
 | `send_invoice` | Email a Stripe-hosted invoice with payment link (no DB change) |
 
 ## Setup
@@ -63,3 +64,5 @@ Open [http://localhost:3000](http://localhost:3000).
 - "Update invoice {id} to add a line item 'Delivery' for $50"
 - "Send invoice {id} to the client"
 - "Delete invoice {id}"
+- "List invoices for jane@example.com"
+- "Show page 2 of invoices matching florals"

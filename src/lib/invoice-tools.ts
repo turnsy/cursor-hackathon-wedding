@@ -5,6 +5,7 @@ import { sendInvoiceViaStripe } from "@/lib/stripe-invoice";
 import {
   createInvoice,
   deleteInvoice,
+  listInvoices,
   updateInvoice,
 } from "@/lib/invoices";
 
@@ -79,6 +80,45 @@ export const invoiceTools = {
       return {
         success: true,
         deleted: invoice,
+      };
+    },
+  }),
+
+  list_invoices: tool({
+    description:
+      "Search and list invoices with pagination. Filter by query (email or title), or specific email/title fields.",
+    inputSchema: z.object({
+      page: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .describe("Page number (1-based). Defaults to 1."),
+      pageSize: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .optional()
+        .describe("Results per page. Defaults to 10, max 50."),
+      query: z
+        .string()
+        .optional()
+        .describe("Search term matched against email and title"),
+      email: z
+        .string()
+        .optional()
+        .describe("Filter by recipient email (partial match)"),
+      title: z
+        .string()
+        .optional()
+        .describe("Filter by invoice title (partial match)"),
+    }),
+    execute: async ({ page, pageSize, query, email, title }) => {
+      const result = await listInvoices({ page, pageSize, query, email, title });
+      return {
+        success: true,
+        ...result,
       };
     },
   }),
