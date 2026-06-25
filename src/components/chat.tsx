@@ -20,6 +20,42 @@ function AgentIcon() {
   );
 }
 
+function formatToolName(name: string) {
+  return name.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function ToolCallLabel({
+  name,
+  state,
+}: {
+  name: string;
+  state: string;
+}) {
+  const label = formatToolName(name);
+
+  if (state === "output-error") {
+    return (
+      <p className="text-xs text-[#ee6c4d]">
+        {label} failed
+      </p>
+    );
+  }
+
+  if (state === "output-available") {
+    return (
+      <p className="text-xs text-[#3d5a80]">
+        Called {label}
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-xs text-[#3d5a80]">
+      Calling {label}...
+    </p>
+  );
+}
+
 function MessageBubble({
   role,
   children,
@@ -108,7 +144,18 @@ export function Chat() {
                 part.type === "text" && part.text.length > 0,
             );
 
-            if (textParts.length === 0) {
+            const toolParts = message.parts.flatMap((part, index) => {
+              if (!part.type.startsWith("tool-")) {
+                return [];
+              }
+
+              const toolName = part.type.replace(/^tool-/, "");
+              const toolPart = part as { state: string };
+
+              return [{ key: index, name: toolName, state: toolPart.state }];
+            });
+
+            if (textParts.length === 0 && toolParts.length === 0) {
               return null;
             }
 
@@ -121,6 +168,13 @@ export function Chat() {
                   <p key={index} className="whitespace-pre-wrap">
                     {part.text}
                   </p>
+                ))}
+                {toolParts.map((tool) => (
+                  <ToolCallLabel
+                    key={tool.key}
+                    name={tool.name}
+                    state={tool.state}
+                  />
                 ))}
               </MessageBubble>
             );
