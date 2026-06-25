@@ -18,6 +18,33 @@ export type UpdateInvoiceInput = {
   lineItems?: LineItem[];
 };
 
+export type ListInvoicesInput = {
+  page?: number;
+  pageSize?: number;
+  query?: string;
+  email?: string;
+  title?: string;
+};
+
+export type InvoiceListResult = {
+  invoices: Awaited<ReturnType<typeof getInvoice>>[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+};
+
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 50;
+
+function escapeIlikePattern(value: string) {
+  return value.replace(/[%_\\]/g, "\\$&");
+}
+
 function normalizeLineItems(lineItems: LineItem[]) {
   return lineItems.map((item) => ({
     description: item.description,
@@ -102,6 +129,59 @@ export async function getInvoice(id: string) {
   }
 
   return data;
+}
+
+export async function listInvoices(
+  input: ListInvoicesInput = {},
+): Promise<InvoiceListResult> {
+  const supabase = createSupabaseClient();
+  const page = Math.max(1, input.page ?? 1);
+  const pageSize = Math.min(
+    MAX_PAGE_SIZE,
+    Math.max(1, input.pageSize ?? DEFAULT_PAGE_SIZE),
+  );
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("invoices")
+    .select("*", { count: "exact" })
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (input.query?.trim()) {
+    const term = escapeIlikePattern(input.query.trim());
+    query = query.or(`email.ilike.%${term}%,title.ilike.%${term}%`);
+  }
+
+  if (input.email?.trim()) {
+    query = query.ilike("email", `%${escapeIlikePattern(input.email.trim())}%`);
+  }
+
+  if (input.title?.trim()) {
+    query = query.ilike("title", `%${escapeIlikePattern(input.title.trim())}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
+
+  if (error) {
+    throw new Error(`Failed to list invoices: ${error.message}`);
+  }
+
+  const total = count ?? 0;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+
+  return {
+    invoices: data ?? [],
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    },
+  };
 }
 
 export function formatInvoiceTotal(lineItems: LineItem[]) {

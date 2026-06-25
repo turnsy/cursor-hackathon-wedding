@@ -15,6 +15,7 @@ Use the available tools to manage invoices in the database:
 - create_invoice: create a new invoice
 - update_invoice: modify an existing invoice by ID
 - delete_invoice: remove an invoice by ID
+- list_invoices: search and list invoices with pagination
 - send_invoice: email an invoice to its recipient
 
 Line items are description/amount pairs (string description, numeric dollar amount).
