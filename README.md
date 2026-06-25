@@ -7,7 +7,7 @@ AI-powered invoice management for the cursor-hackathon-wedding project. Chat wit
 - **Next.js 16** — App Router chat UI
 - **Vercel AI Gateway** — Claude Sonnet 4.6 with tool calling
 - **Supabase** — `invoices` table in `cursor-hackathon-wedding`
-- **Resend** — Email delivery for `send_invoice`
+- **Stripe** — Hosted invoice emails with payment links for `send_invoice`
 
 ## Database
 
@@ -28,7 +28,7 @@ The `invoices` table includes:
 | `create_invoice` | Insert a new invoice |
 | `update_invoice` | Update an existing invoice by ID |
 | `delete_invoice` | Delete an invoice by ID |
-| `send_invoice` | Email the invoice (no DB change) |
+| `send_invoice` | Email a Stripe-hosted invoice with payment link (no DB change) |
 
 ## Setup
 
@@ -42,8 +42,9 @@ cp .env.example .env.local
 
 - `AI_GATEWAY_API_KEY` — from [Vercel AI Gateway](https://vercel.com/docs/ai-gateway)
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — from Supabase project settings → API (publishable key)
-- `RESEND_API_KEY` — from [Resend](https://resend.com) (for `send_invoice`)
-- `RESEND_FROM_EMAIL` — verified sender domain (defaults to `onboarding@resend.dev` for testing)
+- `STRIPE_SECRET_KEY` — from [Stripe Dashboard](https://dashboard.stripe.com/apikeys) (for `send_invoice`)
+- `STRIPE_CURRENCY` — optional, defaults to `usd`
+- `STRIPE_DAYS_UNTIL_DUE` — optional payment due days, defaults to `30`
 
 `NEXT_PUBLIC_SUPABASE_URL` is pre-filled for the `cursor-hackathon-wedding` project.
 

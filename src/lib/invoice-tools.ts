@@ -1,6 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { sendInvoiceEmail } from "@/lib/email";
+import { sendInvoiceViaStripe } from "@/lib/stripe-invoice";
 import {
   createInvoice,
   deleteInvoice,
@@ -84,12 +84,12 @@ export const invoiceTools = {
 
   send_invoice: tool({
     description:
-      "Send an existing invoice to its recipient via email. Does not modify the database.",
+      "Send an existing invoice to its recipient via Stripe. Emails a hosted invoice with payment link. Does not modify the database.",
     inputSchema: z.object({
       id: z.string().uuid().describe("Invoice ID to send"),
     }),
     execute: async ({ id }) => {
-      const result = await sendInvoiceEmail(id);
+      const result = await sendInvoiceViaStripe(id);
       return {
         success: true,
         ...result,
