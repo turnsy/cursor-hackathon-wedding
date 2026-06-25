@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* iMessage-style chat bubbles */
+.chat-area {
+  --chat-bg: #ffffff;
+  --imsg-blue: #007aff;
+  --imsg-gray: #e9e9eb;
+  background: var(--chat-bg);
+}
+
+.chat-bubble {
+  position: relative;
+}
+
+/* sent (Matt) tail, bottom-right */
+.chat-bubble-sent.has-tail::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  bottom: 0;
+  right: -7px;
+  height: 20px;
+  width: 20px;
+  background: var(--imsg-blue);
+  border-bottom-left-radius: 16px;
+}
+.chat-bubble-sent.has-tail::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  right: -16px;
+  height: 20px;
+  width: 16px;
+  background: var(--chat-bg);
+  border-bottom-left-radius: 12px;
+}
+
+/* received (agent) tail, bottom-left */
+.chat-bubble-recv.has-tail::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  bottom: 0;
+  left: -7px;
+  height: 20px;
+  width: 20px;
+  background: var(--imsg-gray);
+  border-bottom-right-radius: 16px;
+}
+.chat-bubble-recv.has-tail::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: -16px;
+  height: 20px;
+  width: 16px;
+  background: var(--chat-bg);
+  border-bottom-right-radius: 12px;
+}
+
+@keyframes imsg-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+.imsg-dot {
+  animation: imsg-typing 1.2s infinite ease-in-out;
+}
