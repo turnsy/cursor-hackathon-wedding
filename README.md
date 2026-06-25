@@ -7,7 +7,7 @@ AI-powered invoice management for the cursor-hackathon-wedding project. Chat wit
 - **Next.js 16** — App Router chat UI
 - **Vercel AI Gateway** — Claude Sonnet 4.6 with tool calling
 - **Supabase** — `invoices` table in `cursor-hackathon-wedding`
-- **Stripe** — Hosted invoice emails with payment links for `send_invoice`
+- **Resend** — Invoice email delivery for `send_invoice` (free tier: 3,000 emails/mo)
 
 ## Database
 
@@ -29,7 +29,7 @@ The `invoices` table includes:
 | `update_invoice` | Update an existing invoice by ID |
 | `delete_invoice` | Delete an invoice by ID |
 | `list_invoices` | Search/list invoices with pagination |
-| `send_invoice` | Email a Stripe-hosted invoice with payment link (no DB change) |
+| `send_invoice` | Email the invoice via Resend (no DB change) |
 
 ## Setup
 
@@ -43,9 +43,10 @@ cp .env.example .env.local
 
 - `AI_GATEWAY_API_KEY` — from [Vercel AI Gateway](https://vercel.com/docs/ai-gateway)
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — from Supabase project settings → API (publishable key)
-- `STRIPE_SECRET_KEY` — from [Stripe Dashboard](https://dashboard.stripe.com/apikeys) (for `send_invoice`)
-- `STRIPE_CURRENCY` — optional, defaults to `usd`
-- `STRIPE_DAYS_UNTIL_DUE` — optional payment due days, defaults to `30`
+- `RESEND_API_KEY` — from [Resend](https://resend.com) (free tier, no credit card)
+- `RESEND_FROM_EMAIL` — sender address; defaults to `onboarding@resend.dev` for testing
+
+On Resend's free tier without a verified domain, you can only send to the email address on your Resend account when using `onboarding@resend.dev`. Verify a domain to send to any recipient.
 
 `NEXT_PUBLIC_SUPABASE_URL` is pre-filled for the `cursor-hackathon-wedding` project.
 
