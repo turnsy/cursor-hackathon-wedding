@@ -20,21 +20,6 @@ function AgentIcon() {
   );
 }
 
-function ToolResult({ name, result }: { name: string; result: unknown }) {
-  return (
-    <div className="mt-2 overflow-hidden rounded-xl bg-[#3d5a80]/60">
-      <div className="border-b border-[#98c1d9]/20 px-3 py-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#98c1d9]">
-          {name.replace(/_/g, " ")}
-        </p>
-      </div>
-      <pre className="overflow-x-auto whitespace-pre-wrap p-3 font-mono text-xs text-[#e0fbfc]/80">
-        {JSON.stringify(result, null, 2)}
-      </pre>
-    </div>
-  );
-}
-
 function MessageBubble({
   role,
   children,
@@ -117,60 +102,29 @@ export function Chat() {
             </MessageBubble>
           )}
 
-          {messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              role={message.role === "user" ? "user" : "assistant"}
-            >
-              {message.parts.map((part, index) => {
-                if (part.type === "text") {
-                  return (
-                    <p key={index} className="whitespace-pre-wrap">
-                      {part.text}
-                    </p>
-                  );
-                }
+          {messages.map((message) => {
+            const textParts = message.parts.filter(
+              (part): part is Extract<typeof part, { type: "text" }> =>
+                part.type === "text" && part.text.length > 0,
+            );
 
-                if (part.type.startsWith("tool-")) {
-                  const toolName = part.type.replace(/^tool-/, "");
-                  const toolPart = part as {
-                    state: string;
-                    output?: unknown;
-                    errorText?: string;
-                  };
+            if (textParts.length === 0) {
+              return null;
+            }
 
-                  if (
-                    toolPart.state === "output-available" &&
-                    toolPart.output !== undefined
-                  ) {
-                    return (
-                      <ToolResult
-                        key={index}
-                        name={toolName}
-                        result={toolPart.output}
-                      />
-                    );
-                  }
-
-                  if (toolPart.state === "output-error" && toolPart.errorText) {
-                    return (
-                      <p key={index} className="text-[#ee6c4d]">
-                        {toolName} failed: {toolPart.errorText}
-                      </p>
-                    );
-                  }
-
-                  return (
-                    <p key={index} className="text-[#3d5a80]">
-                      Running {toolName}...
-                    </p>
-                  );
-                }
-
-                return null;
-              })}
-            </MessageBubble>
-          ))}
+            return (
+              <MessageBubble
+                key={message.id}
+                role={message.role === "user" ? "user" : "assistant"}
+              >
+                {textParts.map((part, index) => (
+                  <p key={index} className="whitespace-pre-wrap">
+                    {part.text}
+                  </p>
+                ))}
+              </MessageBubble>
+            );
+          })}
 
           {isLoading && <TypingIndicator />}
 
