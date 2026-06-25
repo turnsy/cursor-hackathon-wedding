@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { logger, serializeError } from "@/lib/logger";
 import { sendInvoiceViaStripe } from "@/lib/stripe-invoice";
 import {
   createInvoice,
@@ -89,11 +90,41 @@ export const invoiceTools = {
       id: z.string().uuid().describe("Invoice ID to send"),
     }),
     execute: async ({ id }) => {
-      const result = await sendInvoiceViaStripe(id);
-      return {
-        success: true,
-        ...result,
-      };
+      logger.info("send_invoice tool invoked", {
+        scope: "send_invoice_tool",
+        invoiceId: id,
+      });
+
+      try {
+        const result = await sendInvoiceViaStripe(id);
+
+        logger.info("send_invoice tool completed", {
+          scope: "send_invoice_tool",
+          invoiceId: id,
+          stripeInvoiceId: result.stripeInvoiceId,
+          status: result.status,
+        });
+
+        return {
+          success: true,
+          ...result,
+        };
+      } catch (error) {
+        const details = serializeError(error);
+
+        logger.error("send_invoice tool failed", {
+          scope: "send_invoice_tool",
+          invoiceId: id,
+          error: details,
+        });
+
+        return {
+          success: false,
+          invoiceId: id,
+          error: details.message ?? "Failed to send invoice",
+          details,
+        };
+      }
     },
   }),
 };
