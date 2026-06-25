@@ -1,17 +1,17 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
-export function createSupabaseAdmin() {
+export function createSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !serviceRoleKey) {
+  if (!url || !publishableKey) {
     throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
+      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
     );
   }
 
-  return createClient<Database>(url, serviceRoleKey, {
+  return createClient<Database>(url, publishableKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

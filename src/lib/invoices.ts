@@ -1,5 +1,5 @@
 import type { Database, LineItem } from "@/lib/supabase/database.types";
-import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { createSupabaseClient } from "@/lib/supabase/server";
 
 type InvoiceUpdate = Database["public"]["Tables"]["invoices"]["Update"];
 
@@ -26,7 +26,7 @@ function normalizeLineItems(lineItems: LineItem[]) {
 }
 
 export async function createInvoice(input: CreateInvoiceInput) {
-  const supabase = createSupabaseAdmin();
+  const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
     .from("invoices")
@@ -47,7 +47,7 @@ export async function createInvoice(input: CreateInvoiceInput) {
 }
 
 export async function updateInvoice(input: UpdateInvoiceInput) {
-  const supabase = createSupabaseAdmin();
+  const supabase = createSupabaseClient();
 
   const updates: InvoiceUpdate = {};
   if (input.email !== undefined) updates.email = input.email;
@@ -72,7 +72,7 @@ export async function updateInvoice(input: UpdateInvoiceInput) {
 }
 
 export async function deleteInvoice(id: string) {
-  const supabase = createSupabaseAdmin();
+  const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
     .from("invoices")
@@ -89,7 +89,7 @@ export async function deleteInvoice(id: string) {
 }
 
 export async function getInvoice(id: string) {
-  const supabase = createSupabaseAdmin();
+  const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
     .from("invoices")

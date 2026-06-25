@@ -41,7 +41,7 @@ cp .env.example .env.local
 2. Fill in:
 
 - `AI_GATEWAY_API_KEY` — from [Vercel AI Gateway](https://vercel.com/docs/ai-gateway)
-- `SUPABASE_SERVICE_ROLE_KEY` — from Supabase project settings → API
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — from Supabase project settings → API (publishable key)
 - `RESEND_API_KEY` — from [Resend](https://resend.com) (for `send_invoice`)
 - `RESEND_FROM_EMAIL` — verified sender domain (defaults to `onboarding@resend.dev` for testing)
 
